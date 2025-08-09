@@ -1,0 +1,53 @@
+# config/services.yaml
+parameters:
+    client_data_file: '%kernel.project_dir%/var/data/clients.json'
+    loan_products_data_file: '%kernel.project_dir%/var/data/loan_products.json'
+
+services:
+    # Цей блок встановлює налаштування за замовчуванням для всіх сервісів
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Цей блок каже Symfony автоматично завантажувати всі класи з папки src/
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Kernel.php'
+
+    # --- НАША ЯВНА КОНФІГУРАЦІЯ ---
+
+    # Вказуємо аргументи для файлових репозиторіїв
+    App\Loan\Infrastructure\Persistence\FileClientRepository:
+        arguments:
+            $filePath: '%client_data_file%'
+
+    App\Loan\Infrastructure\Persistence\FileLoanProductRepository:
+        arguments:
+            $filePath: '%loan_products_data_file%'
+
+    # Вказуємо аргументи для сервісів, які приймають масиви правил/модифікаторів
+    App\Loan\Application\Service\CheckEligibility:
+        arguments:
+            $rules:
+                - '@App\Loan\Domain\Eligibility\Rule\AgeRule'
+                - '@App\Loan\Domain\Eligibility\Rule\IncomeRule'
+                - '@App\Loan\Domain\Eligibility\Rule\RegionRule'
+
+    App\Loan\Application\Service\GenerateLoanOffers:
+        arguments:
+            $modifiers:
+                - '@App\Loan\Domain\Eligibility\Modifier\CreditHistoryModifier'
+                - '@App\Loan\Domain\Eligibility\Modifier\OstravaRateModifier'
+                - '@App\Loan\Domain\Eligibility\Modifier\PragueRandomDeclineModifier'
+
+    # Аліаси для інтерфейсів
+    App\Loan\Domain\Client\ClientRepositoryInterface:
+        '@App\Loan\Infrastructure\Persistence\FileClientRepository'
+
+    App\Loan\Domain\Loan\LoanProductRepositoryInterface:
+        '@App\Loan\Infrastructure\Persistence\FileLoanProductRepository'
+
+    App\Loan\Application\Port\NotifierInterface:
+        '@App\Loan\Infrastructure\Notifier\LogNotifier'
