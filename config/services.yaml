@@ -51,3 +51,5 @@ services:
 
     App\Loan\Application\Port\NotifierInterface:
         '@App\Loan\Infrastructure\Notifier\LogNotifier'
+    App\Loan\Domain\Shared\RandomNumberGeneratorInterface:
+        '@App\Loan\Infrastructure\Service\PhpRandomNumberGenerator'
