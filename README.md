@@ -204,3 +204,48 @@ The project uses files for data storage, as was allowed in the task. You can edi
 
 -   **Clients:** `var/data/clients.json`
 -   **Loan Products:** `var/data/loan_products.json`
+
+---
+
+## Testing
+
+The project includes a suite of unit tests to verify the business logic. **PHPUnit** is used as the testing framework.
+
+### Running Tests
+
+The testing tools are included as development dependencies. Make sure they are installed by running `composer install`.
+
+1.  **Run all tests:**
+    To execute the entire test suite, run the following command from the project root:
+
+    ```bash
+    docker-compose exec php ./bin/phpunit
+    ```
+
+2.  **Detailed Output (`--verbose`):**
+    To see a detailed list of which tests are being executed, use the `--verbose` flag:
+
+    ```bash
+    docker-compose exec php ./bin/phpunit --verbose
+    ```
+
+3.  **Documentation-style Output (`--testdox`):**
+    For a more human-readable output that describes what is being tested, use the `--testdox` flag. This is the recommended way to view test results.
+
+    ```bash
+    docker-compose exec php ./bin/phpunit --testdox
+    ```
+
+    **Example Output:**
+
+    ```
+    Age Rule Test
+     ✔ Check should pass for valid age
+     ✔ Check should throw exception for underage client
+     ✔ Check should throw exception for overage client
+
+    Prague Random Decline Modifier Test
+     ✔ Should decline offers when random is zero
+     ✔ Should keep offers when random is one
+     ✔ Should do nothing for non prague client
+    ```
